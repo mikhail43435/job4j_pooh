@@ -31,7 +31,7 @@ public class ReqTest {
                 + "Accept: */*" + System.lineSeparator()
                 + "userId=1";
         var req = Req.of(content);
-        assertThat(req.method(), is("POST"));
+        assertThat(req.method(), is("GET"));
         assertThat(req.mode(), is("queue"));
         assertThat(req.queue(), is("weather"));
         assertThat(req.param("userId"), is("1"));

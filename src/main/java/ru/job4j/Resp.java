@@ -1,5 +1,8 @@
 package ru.job4j;
 
+/**
+ * Resp - ответ от сервиса
+ */
 public class Resp {
     private final String text;
     private final int status;

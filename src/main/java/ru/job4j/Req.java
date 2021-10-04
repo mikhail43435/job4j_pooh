@@ -7,7 +7,7 @@ import java.util.Map;
  * method - GET или POST. Он указывает на тип запроса.
  * mode - указывает на режим работы: queue или topic.
  * queue - имя очереди.
- * text - содержимое запроса.
+ * params - содержимое запроса.
  */
 
 public class Req {
@@ -37,7 +37,7 @@ public class Req {
     }
 
     public String queue() {
-        return null;
+        return queue;
     }
 
     public String param(String key) {

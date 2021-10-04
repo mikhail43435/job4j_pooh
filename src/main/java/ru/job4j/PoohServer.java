@@ -15,6 +15,8 @@ import java.util.concurrent.Executors;
  * Клиенты могут быть двух типов: отправители (publisher), получатели (subscriber).
  * В качестве клиента будем использовать cURL. https://curl.se/download.html
  * В качестве протокола будем использовать HTTP.
+ *
+ * Этот класс считает данные из запроса и отправляет их обработно
  */
 public class PoohServer {
     private final HashMap<String, Service> modes = new HashMap<>();
@@ -23,8 +25,7 @@ public class PoohServer {
         modes.put("queue", new QueueService());
         modes.put("topic", new TopicService());
         ExecutorService pool = Executors.newFixedThreadPool(
-                Runtime.getRuntime().availableProcessors()
-        );
+                Runtime.getRuntime().availableProcessors());
         try (ServerSocket server = new ServerSocket(9000)) {
             while (!server.isClosed()) {
                 Socket socket = server.accept();

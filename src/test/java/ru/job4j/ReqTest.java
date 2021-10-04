@@ -9,15 +9,13 @@ public class ReqTest {
 
     @Test
     public void whenPostMethod() {
-        var content = """
-                POST /topic/weather HTTP/1.1
-                Host: localhost:9000
-                User-Agent: curl/7.67.0
-                Accept: */*
-                Content-Length: 7
-                Content-Type: application/x-www-form-urlencoded
-                text=13
-                """;
+        var content = "POST /topic/weather HTTP/1.1" + System.lineSeparator()
+                + "Host: localhost:9000" + System.lineSeparator()
+                + "User-Agent: curl/7.67.0" + System.lineSeparator()
+                + "Accept: */*" + System.lineSeparator()
+                + "Content-Length: 7" + System.lineSeparator()
+                + "Content-Type: application/x-www-form-urlencoded" + System.lineSeparator()
+                + "text=13";
         var req = Req.of(content);
         assertThat(req.method(), is("POST"));
         assertThat(req.mode(), is("topic"));
@@ -27,14 +25,11 @@ public class ReqTest {
 
     @Test
     public void whenGetMethod() {
-        var content = """
-                GET /queue/weather HTTP/1.1
-                       Host: localhost:9000
-                       User-Agent: curl/7.67.0
-                       Accept: */*
-
-                userId=1
-                """;
+        var content = "GET /queue/weather HTTP/1.1" + System.lineSeparator()
+                + "Host: localhost:9000" + System.lineSeparator()
+                + "User-Agent: curl/7.67.0" + System.lineSeparator()
+                + "Accept: */*" + System.lineSeparator()
+                + "userId=1";
         var req = Req.of(content);
         assertThat(req.method(), is("POST"));
         assertThat(req.mode(), is("queue"));

@@ -2,6 +2,14 @@ package ru.job4j;
 
 import java.util.Map;
 
+/**
+ * Req - класс, служить для парсинга входящего сообщения.
+ * method - GET или POST. Он указывает на тип запроса.
+ * mode - указывает на режим работы: queue или topic.
+ * queue - имя очереди.
+ * text - содержимое запроса.
+ */
+
 public class Req {
     private final String method;
     private final String mode;

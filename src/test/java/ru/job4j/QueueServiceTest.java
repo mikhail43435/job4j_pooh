@@ -1,7 +1,5 @@
 package ru.job4j;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -18,9 +16,9 @@ public class QueueServiceTest {
         Map<String, String> params = new HashMap<>();
         params.put("temperature", "18");
         /* Добавляем данные в очередь weather. Режим queue */
-        queueService.process(new Req("POST", "queue", "weather", params));
+        queueService.process(new MessageParser("POST", "queue", "weather", params));
         /* Забираем данные из очереди weather. Режим queue */
-        var result = queueService.process(new Req("GET", "queue", "weather", null));
+        var result = queueService.process(new MessageParser("GET", "queue", "weather", null));
         assertThat(result.text(), is("18"));
     }
 }

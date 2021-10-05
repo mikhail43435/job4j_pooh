@@ -1,7 +1,5 @@
 package ru.job4j;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -18,9 +16,9 @@ public class TopicServiceTest {
         params.put("userId", "1");
         params.put("temperature", "18");
         /* Добавляем данные в очередь weather. Режим topic */
-        topicService.process(new Req("POST", "topic", "weather", params));
+        topicService.process(new MessageParser("POST", "topic", "weather", params));
         /* Забираем данные из очереди weather. Режим topic */
-        var result = topicService.process(new Req("GET", "topic", "weather", params));
+        ServerResponse result = topicService.process(new MessageParser("GET", "topic", "weather", params));
         assertThat(result.text(), is("18"));
     }
 }

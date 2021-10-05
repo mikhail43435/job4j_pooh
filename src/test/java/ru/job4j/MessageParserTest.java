@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class ReqTest {
+public class MessageParserTest {
 
     @Test
     public void whenPostMethod() {
@@ -16,7 +16,7 @@ public class ReqTest {
                 + "Content-Length: 7" + System.lineSeparator()
                 + "Content-Type: application/x-www-form-urlencoded" + System.lineSeparator()
                 + "text=13";
-        var req = Req.of(content);
+        MessageParser req = MessageParser.of(content);
         assertThat(req.method(), is("POST"));
         assertThat(req.mode(), is("topic"));
         assertThat(req.queue(), is("weather"));
@@ -30,7 +30,7 @@ public class ReqTest {
                 + "User-Agent: curl/7.67.0" + System.lineSeparator()
                 + "Accept: */*" + System.lineSeparator()
                 + "userId=1";
-        var req = Req.of(content);
+        var req = MessageParser.of(content);
         assertThat(req.method(), is("GET"));
         assertThat(req.mode(), is("queue"));
         assertThat(req.queue(), is("weather"));

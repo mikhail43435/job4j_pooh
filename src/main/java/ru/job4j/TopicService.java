@@ -7,7 +7,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Topic
  * Отправитель посылает сообщение с указанием темы.
  * Получатель читает первое сообщение и удаляет его из очереди.
- * ДЛЯ КАЖДОГО потребителя в режиме "topic" должна быть уникальная очередь потребления в отличии от режима "queue",
+ * ДЛЯ КАЖДОГО потребителя в режиме "topic"
+ * должна быть уникальная очередь потребления в отличии от режима "queue",
  * где очереди для всех клиентов одна и та же.
  * POST /topic/weather -d "temperature=18"
  * GET /topic/weather/1
@@ -28,13 +29,16 @@ public class TopicService implements Service {
         if (message.getMethodName().equals("POST")) {
             if (!CMAP.containsKey(message.getQueueName())) {
                 // если такая очередь (топик) отсутствут
-                ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> innerMap =  new ConcurrentHashMap<>();
+                ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> innerMap =
+                        new ConcurrentHashMap<>();
                 innerMap.put(message.getParamForKey(userIdLabel), new ConcurrentLinkedQueue<>());
                 CMAP.putIfAbsent(message.getQueueName(), innerMap);
-            } else if (!CMAP.get(message.getQueueName()).containsKey(message.getParamForKey(userIdLabel))) {
+            } else if (!CMAP.get(message.getQueueName())
+                    .containsKey(message.getParamForKey(userIdLabel))) {
                 // если такая очередь (топик) присутствует, но НЕТ очереди ПОЛЬЗОВАТЕЛЯ
                 // добавляем в мапу пользователя с ConcurrentLinkedQueue
-                CMAP.get(message.getQueueName()).put(message.getParamForKey(userIdLabel), new ConcurrentLinkedQueue<>());
+                CMAP.get(message.getQueueName())
+                        .put(message.getParamForKey(userIdLabel), new ConcurrentLinkedQueue<>());
             }
             // добавляем занчение в ОЧЕРЕДЬ (ТОПИК) и в ОЧЕРЕДЬ ПОЛЬЗОВАТЕЛЯ
             CMAP.get(message.getQueueName())

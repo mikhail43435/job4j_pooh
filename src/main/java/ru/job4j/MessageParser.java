@@ -16,19 +16,18 @@ import java.util.Map;
 public class MessageParser {
     private final String method;
     private final String mode;
-    private final String queue;
+    private final String queueName;
     private final Map<String, String> params;
 
-    public MessageParser(String method, String mode, String queue, Map<String, String> params) {
+    public MessageParser(String method, String mode, String queueName, Map<String, String> params) {
         this.method = method;
         this.mode = mode;
-        this.queue = queue;
+        this.queueName = queueName;
         this.params = params;
     }
 
     public static MessageParser of(String content) {
         String[] contentArray = content.split("\r\n");
-        String method = "";
         if (contentArray.length != 0) {
             if (contentArray[0].startsWith("POST")) {
                 return getPostMessage(contentArray);
@@ -82,19 +81,23 @@ public class MessageParser {
 
     }
 
-    public String method() {
+    public String getMethodName() {
         return method;
     }
 
-    public String mode() {
+    public String getMode() {
         return mode;
     }
 
-    public String queue() {
-        return queue;
+    public String getQueueName() {
+        return queueName;
     }
 
-    public String param(String key) {
+    public String getSingleParam() {
+        return params.entrySet().iterator().next().getValue();
+    }
+
+    public String getParamForKey(String key) {
         return params.get(key);
     }
 }

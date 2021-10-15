@@ -18,7 +18,7 @@ public class QueueServiceTest {
         /* Добавляем данные в очередь weather. Режим queue */
         queueService.process(new MessageParser("POST", "queue", "weather", params));
         /* Забираем данные из очереди weather. Режим queue */
-        var result = queueService.process(new MessageParser("GET", "queue", "weather", null));
-        assertThat(result.text(), is("18"));
+        var result = queueService.process(new MessageParser("GET", "queue", "weather", params));
+        assertThat(result.getText(), is("18"));
     }
 }

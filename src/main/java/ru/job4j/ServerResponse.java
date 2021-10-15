@@ -12,11 +12,11 @@ public class ServerResponse {
         this.status = status;
     }
 
-    public String text() {
+    public String getText() {
         return text;
     }
 
-    public int status() {
+    public int getStatus() {
         return status;
     }
 }

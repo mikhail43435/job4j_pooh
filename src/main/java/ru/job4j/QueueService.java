@@ -1,5 +1,8 @@
 package ru.job4j;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 /**
  * Queue
  * Отправитель посылает сообщение с указанием очереди.
@@ -20,8 +23,23 @@ package ru.job4j;
  * Ответ, temperature=18
  */
 public class QueueService implements Service {
+
+    private final ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> cMap =
+            new ConcurrentHashMap<>();
+
     @Override
-    public ServerResponse process(MessageParser messageParser) {
-        return null;
+    public ServerResponse process(MessageParser message) {
+        if (message.getMethodName().equals("POST")) {
+            cMap.putIfAbsent(message.getQueueName(), new ConcurrentLinkedQueue<>());
+            cMap.get(message.getQueueName()).add(message.getSingleParam());
+            return new ServerResponse("OK", 200);
+        } else if (message.getMethodName().equals("GET")) {
+            if (cMap.containsKey(message.getQueueName())) {
+                return new ServerResponse(cMap.get(message.getQueueName()).poll(), 200);
+            } else {
+                return new ServerResponse("Queue not found", 404);
+            }
+        }
+        return new ServerResponse("Invalid method name in message header", 400);
     }
 }

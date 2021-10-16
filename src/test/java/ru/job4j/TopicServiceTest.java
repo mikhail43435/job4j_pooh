@@ -16,9 +16,7 @@ public class TopicServiceTest {
         Map<String, String> params = new HashMap<>();
         params.put("userId", "1");
         params.put("temperature", "18");
-        /* Добавляем данные в очередь weather. Режим topic */
         topicService.process(new MessageParser("POST", "topic", "weather", params));
-        /* Забираем данные из очереди weather. Режим topic */
         ServerResponse result = topicService.process(new MessageParser("GET", "topic", "weather", params));
         assertThat(result.getText(), is("18"));
     }
@@ -29,9 +27,7 @@ public class TopicServiceTest {
         Map<String, String> paramsForPutAction = new HashMap<>();
         paramsForPutAction.put("userId", "1");
         paramsForPutAction.put("temperature", "18");
-        /* Добавляем данные в очередь weather. Режим topic */
         topicService.process(new MessageParser("POST", "topic", "weather", paramsForPutAction));
-        /* Забираем данные из очереди weather. Режим topic */
         Map<String, String> paramsForGetAction = new HashMap<>();
         paramsForGetAction.put("userId", "1");
         ServerResponse firstResult = topicService.process(new MessageParser("GET", "topic", "weather", paramsForGetAction));
@@ -49,10 +45,8 @@ public class TopicServiceTest {
         Map<String, String> paramsSecondUser = new HashMap<>();
         paramsSecondUser.put("userId", "2");
         paramsSecondUser.put("temperature", "19");
-        /* Добавляем данные в очередь weather. Режим topic */
         topicService.process(new MessageParser("POST", "topic", "weather", paramsFirstUser));
         topicService.process(new MessageParser("POST", "topic", "weather", paramsSecondUser));
-        /* Забираем данные из очереди weather. Режим topic */
         ServerResponse resultForFirstUser = topicService.process(new MessageParser("GET", "topic", "weather", paramsFirstUser));
         assertThat(resultForFirstUser.getText(), is("18"));
         ServerResponse resultForSecondUser = topicService.process(new MessageParser("GET", "topic", "weather", paramsSecondUser));

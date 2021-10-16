@@ -27,7 +27,7 @@ public class MessageParser {
     }
 
     public static MessageParser of(String content) {
-        String[] contentArray = content.split("\r\n");
+        String[] contentArray = content.split(System.lineSeparator());
         if (contentArray.length != 0) {
             if (contentArray[0].startsWith("POST")) {
                 return getPostMessage(contentArray);

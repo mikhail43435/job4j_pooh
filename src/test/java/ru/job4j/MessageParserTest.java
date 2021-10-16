@@ -16,11 +16,11 @@ public class MessageParserTest {
                 + "Content-Length: 7" + System.lineSeparator()
                 + "Content-Type: application/x-www-form-urlencoded" + System.lineSeparator()
                 + "text=13";
-        MessageParser req = MessageParser.of(content);
-        assertThat(req.getMethodName(), is("POST"));
-        assertThat(req.getMode(), is("topic"));
-        assertThat(req.getQueueName(), is("weather"));
-        assertThat(req.getSingleParam(), is("13"));
+        MessageParser message = MessageParser.of(content);
+        assertThat(message.getMethodName(), is("POST"));
+        assertThat(message.getMode(), is("topic"));
+        assertThat(message.getQueueName(), is("weather"));
+        assertThat(message.getSingleParam(), is("13"));
     }
 
     @Test
@@ -30,10 +30,10 @@ public class MessageParserTest {
                 + "User-Agent: curl/7.67.0" + System.lineSeparator()
                 + "Accept: */*" + System.lineSeparator()
                 + "userId=1";
-        var req = MessageParser.of(content);
-        assertThat(req.getMethodName(), is("GET"));
-        assertThat(req.getMode(), is("queue"));
-        assertThat(req.getQueueName(), is("weather"));
-        assertThat(req.getSingleParam(), is("1"));
+        var message = MessageParser.of(content);
+        assertThat(message.getMethodName(), is("GET"));
+        assertThat(message.getMode(), is("queue"));
+        assertThat(message.getQueueName(), is("weather"));
+        assertThat(message.getSingleParam(), is("1"));
     }
 }

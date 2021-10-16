@@ -28,19 +28,15 @@ public class TopicService implements Service {
         String userIdLabel = "userId";
         if (message.getMethodName().equals("POST")) {
             if (!CMAP.containsKey(message.getQueueName())) {
-                // если такая очередь (топик) отсутствут
                 ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> innerMap =
                         new ConcurrentHashMap<>();
                 innerMap.put(message.getParamForKey(userIdLabel), new ConcurrentLinkedQueue<>());
                 CMAP.putIfAbsent(message.getQueueName(), innerMap);
             } else if (!CMAP.get(message.getQueueName())
                     .containsKey(message.getParamForKey(userIdLabel))) {
-                // если такая очередь (топик) присутствует, но НЕТ очереди ПОЛЬЗОВАТЕЛЯ
-                // добавляем в мапу пользователя с ConcurrentLinkedQueue
                 CMAP.get(message.getQueueName())
                         .put(message.getParamForKey(userIdLabel), new ConcurrentLinkedQueue<>());
             }
-            // добавляем занчение в ОЧЕРЕДЬ (ТОПИК) и в ОЧЕРЕДЬ ПОЛЬЗОВАТЕЛЯ
             CMAP.get(message.getQueueName())
                     .get(message.getParamForKey(userIdLabel))
                     .add(message.getParamForKey("temperature"));

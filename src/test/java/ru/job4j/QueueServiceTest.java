@@ -15,8 +15,10 @@ public class QueueServiceTest {
         var queueService = new QueueService();
         Map<String, String> params = new HashMap<>();
         params.put("temperature", "18");
-        queueService.process(new MessageParser("POST", "queue", "weather", params));
-        var result = queueService.process(new MessageParser("GET", "queue", "weather", params));
+        queueService.process(
+                new MessageParser("POST", "queue", "weather", params));
+        var result = queueService.process(
+                new MessageParser("GET", "queue", "weather", params));
         assertThat(result.getText(), is("18"));
     }
 }

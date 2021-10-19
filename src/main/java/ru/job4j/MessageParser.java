@@ -1,8 +1,5 @@
 package ru.job4j;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Req - класс, служить для парсинга входящего сообщения.
  * httpRequestType - GET или POST. Он указывает на тип запроса.
@@ -23,34 +20,30 @@ public class MessageParser {
     private final String httpRequestType;
     private final String poohMode;
     private final String sourceName;
-    private final Map<String, String> params;
+    private final String param;
 
-    public MessageParser(String httpRequestType, String poohMode, String sourceName, Map<String, String> params) {
+    public MessageParser(String httpRequestType, String poohMode, String sourceName, String param) {
         this.httpRequestType = httpRequestType;
         this.poohMode = poohMode;
         this.sourceName = sourceName;
-        this.params = params;
+        this.param = param;
     }
 
     public static MessageParser of(String content) {
         String[] contentArray = content.split(System.lineSeparator());
-        Map<String, String> paramsMap = new HashMap<>();
         String[] startingLine = contentArray[0].replace("/", " ").split(" ");
         String httpRequestType = startingLine[0];
         String poohMode = startingLine[2];
         String sourceName = startingLine[3];
-        int lineCounter = 1;
-        while (lineCounter < contentArray.length && !contentArray[lineCounter].trim().equals("")) {
-            lineCounter++;
+        String param = "";
+        if (httpRequestType.equals("POST")) {
+            param = contentArray[contentArray.length - 1];
+        } else if (httpRequestType.equals("GET")) {
+            param = poohMode.equals("queue") ? "" : startingLine[4];
+        } else {
+            throw new IllegalArgumentException("Illegal request type");
         }
-        lineCounter++;
-        while (lineCounter < contentArray.length && !contentArray[lineCounter].trim().equals("")) {
-            String[] paramArray = contentArray[lineCounter++].split("=");
-            if (paramArray.length >= 2) {
-                paramsMap.put(paramArray[0], paramArray[1]);
-            }
-        }
-        return new MessageParser(httpRequestType, poohMode, sourceName, paramsMap);
+        return new MessageParser(httpRequestType, poohMode, sourceName, param);
     }
 
     public String httpRequestType() {
@@ -61,15 +54,11 @@ public class MessageParser {
         return poohMode;
     }
 
-    public String getSourceName() {
+    public String getQueueName() {
         return sourceName;
     }
 
-    public String getFirstParam() {
-        return params.size() > 0 ? params.entrySet().iterator().next().getValue() : "";
-    }
-
-    public String getParamForKey(String key) {
-        return params.get(key);
+    public String getParam() {
+        return this.param;
     }
 }

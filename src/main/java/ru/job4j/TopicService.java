@@ -5,58 +5,75 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Topic
- * Отправитель посылает сообщение с указанием темы.
- * Получатель читает первое сообщение и удаляет его из очереди.
- * ДЛЯ КАЖДОГО потребителя в режиме "topic"
- * должна быть уникальная очередь потребления в отличии от режима "queue",
- * где очереди для всех клиентов одна и та же.
- * POST /topic/weather -d "temperature=18"
- * GET /topic/weather/1
- * topic - указывает на режим темы
- * weather - имя темы, если темы нет, то нужно создать новую
- * 1 - ID клиента
- * Ответ temperature=18
- */
+* Topics
+* In JMS a Topic implements publish and subscribe semantics.
+* When you publish a message it goes to all the subscribers who are interested
+* - so zero to many subscribers will receive a copy of the message.
+* Only subscribers who had an active subscription at the time
+ * the broker receives the message will get a copy of the message.
+ *
+*/
+
 public class TopicService implements Service {
 
+    /**
+     * cMap - мапа содержащая данные об очередях и подписчиках.
+     * key - имя очереди
+     * value - мапа,
+     *      где key - имя подписчика
+     *      value - очередь ConcurrentLinkedQueue содержащая значения очереди для конкретного подписчика
+     */
     private final ConcurrentHashMap<String,
-            ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>> cMap
-            = new ConcurrentHashMap<>();
-    private final String userIdString = "userId";
+            ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>> cMap = new ConcurrentHashMap<>();
 
     @Override
     public ServerResponse process(MessageParser message) {
         if (message.httpRequestType().equals("POST")) {
-            return getResponseForPostMethod(message);
+            return processPostMethod(message);
         } else if (message.httpRequestType().equals("GET")) {
-            return getResponseForGetMethod(message);
+            return processGetMethod(message);
         }
         return new ServerResponse("Invalid method name in message header", 400);
     }
 
-    private ServerResponse getResponseForPostMethod(MessageParser message) {
-        ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> innerMap =
-                new ConcurrentHashMap<>();
-        innerMap.put(message.getParamForKey(userIdString), new ConcurrentLinkedQueue<>());
-        cMap.putIfAbsent(message.getSourceName(), innerMap);
-        cMap.get(message.getSourceName())
-                .putIfAbsent(message.getParamForKey(userIdString), new ConcurrentLinkedQueue<>());
-        cMap.get(message.getSourceName())
-                .get(message.getParamForKey(userIdString))
-                .add(message.getParamForKey("temperature"));
-        return new ServerResponse("Posted " + message.getSourceName(), 200);
+    private ServerResponse processPostMethod(MessageParser message) {
+        /* готовим кМапу для добавляем в очередь */
+        ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> subscribersMap = new ConcurrentHashMap<>();
+        subscribersMap.put(message.getParam(), new ConcurrentLinkedQueue<>());
+        /* если нет такой очереди то добавляем ее */
+        cMap.putIfAbsent(message.getQueueName(), subscribersMap);
+        /* добавляем полученные данные во все очереди подписок */
+        ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> fss = cMap.get(message.getQueueName());
+        for (Map.Entry<String, ConcurrentLinkedQueue<String>> entry : fss.entrySet()) {
+            entry.getValue().add(message.getParam());
+        }
+        return new ServerResponse("Message posted at queue: " + message.getQueueName(), 200);
     }
 
-    private ServerResponse getResponseForGetMethod(MessageParser message) {
-        ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> map =
-                cMap.get(message.getSourceName());
-        if (map != null) {
-            return new ServerResponse(map
-                    .get(message.getParamForKey(userIdString))
-                    .poll(), 200);
-        } else {
+    private ServerResponse processGetMethod(MessageParser message) {
+        String subscriberName = message.getParam();
+        cMap.putIfAbsent(message.getQueueName(), new ConcurrentHashMap<>());
+        /* получаем мапу для очереди */
+        ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> mapForQueue = cMap.get(message.getQueueName());
+        if (mapForQueue == null) {
             return new ServerResponse("Queue not found", 404);
+        } else {
+            ConcurrentLinkedQueue<String> linkedQueue = mapForQueue.get(subscriberName);
+            if (linkedQueue == null) {
+                mapForQueue.put(subscriberName, new ConcurrentLinkedQueue<>());
+                return new ServerResponse("Queue for subscriber <"
+                        + subscriberName
+                        + "> in topic <"
+                        + message.getQueueName()
+                        + "> has been created", 200);
+            } else {
+                String paramValue = mapForQueue.get(message.getParam()).poll();
+                if (paramValue == null) {
+                    return new ServerResponse("", 400);
+                } else {
+                    return new ServerResponse(paramValue, 200);
+                }
+            }
         }
     }
 }

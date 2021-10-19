@@ -1,5 +1,6 @@
 package ru.job4j;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -19,10 +20,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class TopicService implements Service {
 
-    private static final ConcurrentHashMap<String,
-            ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>> CMAP
+    private final ConcurrentHashMap<String,
+            ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>> cMap
             = new ConcurrentHashMap<>();
-    private static final String USER_ID_STRING = "userId";
+    private final String userIdString = "userId";
 
     @Override
     public ServerResponse process(MessageParser message) {
@@ -37,22 +38,22 @@ public class TopicService implements Service {
     private ServerResponse getResponseForPostMethod(MessageParser message) {
         ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> innerMap =
                 new ConcurrentHashMap<>();
-        innerMap.put(message.getParamForKey(USER_ID_STRING), new ConcurrentLinkedQueue<>());
-        CMAP.putIfAbsent(message.getSourceName(), innerMap);
-        CMAP.get(message.getSourceName())
-                .putIfAbsent(message.getParamForKey(USER_ID_STRING), new ConcurrentLinkedQueue<>());
-        CMAP.get(message.getSourceName())
-                .get(message.getParamForKey(USER_ID_STRING))
+        innerMap.put(message.getParamForKey(userIdString), new ConcurrentLinkedQueue<>());
+        cMap.putIfAbsent(message.getSourceName(), innerMap);
+        cMap.get(message.getSourceName())
+                .putIfAbsent(message.getParamForKey(userIdString), new ConcurrentLinkedQueue<>());
+        cMap.get(message.getSourceName())
+                .get(message.getParamForKey(userIdString))
                 .add(message.getParamForKey("temperature"));
         return new ServerResponse("Posted " + message.getSourceName(), 200);
     }
 
     private ServerResponse getResponseForGetMethod(MessageParser message) {
         ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> map =
-                CMAP.get(message.getSourceName());
+                cMap.get(message.getSourceName());
         if (map != null) {
             return new ServerResponse(map
-                    .get(message.getParamForKey(USER_ID_STRING))
+                    .get(message.getParamForKey(userIdString))
                     .poll(), 200);
         } else {
             return new ServerResponse("Queue not found", 404);

@@ -35,19 +35,10 @@ public class MessageParser {
     public static MessageParser of(String content) {
         String[] contentArray = content.split(System.lineSeparator());
         Map<String, String> paramsMap = new HashMap<>();
-        if (contentArray.length == 0) {
-            throw new IllegalArgumentException("Illegal message provided: message is empty");
-        }
         String[] startingLine = contentArray[0].replace("/", " ").split(" ");
-        if (startingLine.length < 3) {
-            throw new IllegalArgumentException("Invalid header: mode or queue info not found");
-        }
         String httpRequestType = startingLine[0];
         String poohMode = startingLine[2];
         String sourceName = startingLine[3];
-        if (content.length() < 2) {
-            return new MessageParser(httpRequestType, poohMode, sourceName, paramsMap);
-        }
         int lineCounter = 1;
         while (lineCounter < contentArray.length && !contentArray[lineCounter].trim().equals("")) {
             lineCounter++;

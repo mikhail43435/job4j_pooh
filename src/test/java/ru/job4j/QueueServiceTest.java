@@ -16,7 +16,7 @@ public class QueueServiceTest {
                         "weather",
                         "temperature=18")
         );
-        ServerResponse result = queueService.process(
+        ServiceResponse result = queueService.process(
                 new MessageParser("GET",
                         "queue",
                         "weather",
@@ -29,7 +29,7 @@ public class QueueServiceTest {
     @Test
     public void whenInvalidMode() {
         QueueService queueService = new QueueService();
-        ServerResponse result = queueService.process(
+        ServiceResponse result = queueService.process(
                 new MessageParser("POST",
                         "topic",
                         "weather",
@@ -48,7 +48,7 @@ public class QueueServiceTest {
                         "weather",
                         "temperature=18")
         );
-        ServerResponse result = queueService.process(
+        ServiceResponse result = queueService.process(
                 new MessageParser("GET",
                         "queue",
                         "weather",
@@ -69,7 +69,7 @@ public class QueueServiceTest {
     @Test
     public void whenNoQueue() {
         QueueService queueService = new QueueService();
-        ServerResponse result = queueService.process(
+        ServiceResponse result = queueService.process(
                 new MessageParser("GET",
                         "queue",
                         "weather",
@@ -98,7 +98,7 @@ public class QueueServiceTest {
                         "queue",
                         "weather",
                         "temperature=20"));
-        ServerResponse result = queueService.process(
+        ServiceResponse result = queueService.process(
                 new MessageParser("GET",
                         "queue",
                         "weather",

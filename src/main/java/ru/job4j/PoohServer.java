@@ -10,13 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * В этом проекте мы сделаем аналог асинхронной очереди.
- * Приложение запускает Socket и ждет клиентов.
- * Клиенты могут быть двух типов: отправители (publisher), получатели (subscriber).
- * В качестве клиента будем использовать cURL. https://curl.se/download.html
- * В качестве протокола будем использовать HTTP.
- *
- * Этот класс считает данные из запроса и отправляет их обработно
+ * Класс сервера.
+ * Этот класс считает данные из запроса и отправляет их обработно.
  */
 public class PoohServer {
     private final HashMap<String, Service> modes = new HashMap<>();

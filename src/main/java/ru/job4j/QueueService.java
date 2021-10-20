@@ -38,34 +38,34 @@ public class QueueService implements Service {
             new ConcurrentHashMap<>();
 
     @Override
-    public ServerResponse process(MessageParser message) {
+    public ServiceResponse process(MessageParser message) {
         if (!message.getPoohMode().equals("queue")) {
-            return new ServerResponse("Invalid mode type", 400);
+            return new ServiceResponse("Invalid mode type", 400);
         }
         if (message.httpRequestType().equals("POST")) {
             return processPostMessage(message);
         } else if (message.httpRequestType().equals("GET")) {
             return processGetMessage(message);
         }
-        return new ServerResponse("Invalid method name in message header", 400);
+        return new ServiceResponse("Invalid method name in message header", 400);
     }
 
-    private ServerResponse processPostMessage(MessageParser message) {
+    private ServiceResponse processPostMessage(MessageParser message) {
         cMap.putIfAbsent(message.getQueueName(), new ConcurrentLinkedQueue<>());
         cMap.get(message.getQueueName()).add(message.getParam());
-        return new ServerResponse("OK", 200);
+        return new ServiceResponse("OK", 200);
     }
 
-    private ServerResponse processGetMessage(MessageParser message) {
+    private ServiceResponse processGetMessage(MessageParser message) {
         ConcurrentLinkedQueue<String> queue = cMap.get(message.getQueueName());
         if (queue == null) {
-            return new ServerResponse("Queue not found", 404);
+            return new ServiceResponse("Queue not found", 404);
         }
         String param = queue.poll();
         if (param != null) {
-            return new ServerResponse(param, 200);
+            return new ServiceResponse(param, 200);
         } else {
-            return new ServerResponse("Queue is empty", 400);
+            return new ServiceResponse("Queue is empty", 400);
         }
     }
 }

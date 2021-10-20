@@ -27,16 +27,16 @@ public class TopicService implements Service {
             ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>> cMap = new ConcurrentHashMap<>();
 
     @Override
-    public ServerResponse process(MessageParser message) {
+    public ServiceResponse process(MessageParser message) {
         if (message.httpRequestType().equals("POST")) {
             return processPostMethod(message);
         } else if (message.httpRequestType().equals("GET")) {
             return processGetMethod(message);
         }
-        return new ServerResponse("Invalid method name in message header", 400);
+        return new ServiceResponse("Invalid method name in message header", 400);
     }
 
-    private ServerResponse processPostMethod(MessageParser message) {
+    private ServiceResponse processPostMethod(MessageParser message) {
         /* готовим кМапу для добавляем в очередь */
         ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> subscribersMap = new ConcurrentHashMap<>();
         subscribersMap.put(message.getParam(), new ConcurrentLinkedQueue<>());
@@ -47,21 +47,21 @@ public class TopicService implements Service {
         for (Map.Entry<String, ConcurrentLinkedQueue<String>> entry : fss.entrySet()) {
             entry.getValue().add(message.getParam());
         }
-        return new ServerResponse("Message posted at queue: " + message.getQueueName(), 200);
+        return new ServiceResponse("Message posted at queue: " + message.getQueueName(), 200);
     }
 
-    private ServerResponse processGetMethod(MessageParser message) {
+    private ServiceResponse processGetMethod(MessageParser message) {
         String subscriberName = message.getParam();
         cMap.putIfAbsent(message.getQueueName(), new ConcurrentHashMap<>());
         /* получаем мапу для очереди */
         ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> mapForQueue = cMap.get(message.getQueueName());
         if (mapForQueue == null) {
-            return new ServerResponse("Queue not found", 404);
+            return new ServiceResponse("Queue not found", 404);
         } else {
             ConcurrentLinkedQueue<String> linkedQueue = mapForQueue.get(subscriberName);
             if (linkedQueue == null) {
                 mapForQueue.put(subscriberName, new ConcurrentLinkedQueue<>());
-                return new ServerResponse("Queue for subscriber <"
+                return new ServiceResponse("Queue for subscriber <"
                         + subscriberName
                         + "> in topic <"
                         + message.getQueueName()
@@ -69,9 +69,9 @@ public class TopicService implements Service {
             } else {
                 String paramValue = mapForQueue.get(message.getParam()).poll();
                 if (paramValue == null) {
-                    return new ServerResponse("", 400);
+                    return new ServiceResponse("", 400);
                 } else {
-                    return new ServerResponse(paramValue, 200);
+                    return new ServiceResponse(paramValue, 200);
                 }
             }
         }
